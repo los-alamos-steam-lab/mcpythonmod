@@ -30,7 +30,7 @@ public class RaspberryJuice2 extends JavaPlugin implements Listener {
 
 	public List<RemoteSession> sessions;
 
-	public Player hostPlayer = null;
+	public Player player = null;
 
 	private LocationType locationType;
 
@@ -137,7 +137,7 @@ public class RaspberryJuice2 extends JavaPlugin implements Listener {
 		}
 	}
 
-	public Player getNamedPlayer(String name) {
+	public Player getPlayer(String name) {
 		if (name == null) return null;
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (name.equals(player.getPlayerListName())) {
@@ -148,12 +148,26 @@ public class RaspberryJuice2 extends JavaPlugin implements Listener {
 	}
 
 	public Player getHostPlayer() {
-		if (hostPlayer != null) return hostPlayer;
+		return getPlayer();
+	}
+
+	public Player getPlayer() {
+		if (player != null) return player;
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			return player;
 		}
 		return null;
 	}
+
+	public Player getPlayer(int id) {
+		for (Player p : getServer().getOnlinePlayers()) {
+			if (p.getEntityId() == id) {
+				return p;
+			}
+		}
+		return null;
+	}
+
 
 	//get entity by id - DONE to be compatible with the pi it should be changed to return an entity not a player...
 	public Entity getEntity(int id) {
@@ -163,7 +177,7 @@ public class RaspberryJuice2 extends JavaPlugin implements Listener {
 			}
 		}
 		//check all entities in host player's world
-		Player player = getHostPlayer();
+		Player player = getPlayer();
 		World w = player.getWorld();
 		for (Entity e : w.getEntities()) {
 			if (e.getEntityId() == id) {

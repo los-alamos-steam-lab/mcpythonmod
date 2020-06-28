@@ -73,7 +73,7 @@ public class CmdWorld {
 
 			// world.getPlayerId
 		} else if (command.equals("getPlayerId")) {
-			Player p = plugin.getNamedPlayer(args[0]);
+			Player p = plugin.getPlayer(args[0]);
 			if (p != null) {
 				session.send(p.getEntityId());
 			} else {

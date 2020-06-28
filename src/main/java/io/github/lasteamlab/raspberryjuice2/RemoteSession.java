@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayDeque;
+import java.util.Arrays; 
 
 public class RemoteSession {
 
@@ -168,6 +169,11 @@ public class RemoteSession {
 
             if (cmd[0].equals("player")) {
                 cmdPlayer.execute(cmd[1], args);
+
+            } else if (cmd[0].equals("multiplayer")) {
+                String id = args[0];
+                String[] newargs = Arrays.copyOfRange(args, 1, args.length);
+            	cmdPlayer.execute(cmd[1], newargs, id);
 
             } else if (cmd[0].equals("entity")) {
                 cmdEntity.execute(cmd[1], args);
