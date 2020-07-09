@@ -102,6 +102,41 @@ public class CmdEntity {
 			} else {
 				session.send(entity.getName());
 			}
+			// entity.getEntities
+		} else if (command.equals("getEntities")) {
+			int entityId = Integer.parseInt(args[0]);
+			int distance = Integer.parseInt(args[1]);
+			String entityType = args[2];
+
+			session.send(session.getEntities(session.origin.getWorld(), entityId, distance, entityType));
+				
+		// entity.removeEntities
+		} else if (command.equals("removeEntities")) {
+			plugin.getLogger().info(args[0] + args[1] + args[2]);
+			int entityId = Integer.parseInt(args[0]);
+			int distance = Integer.parseInt(args[1]);
+			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(args[2]);
+
+			session.send(session.removeEntities(session.origin.getWorld(), entityId, distance, entityType));
+			// entity.events.clear
+		} else if (command.equals("events.clear")) {
+			int entityId = Integer.parseInt(args[0]);
+			session.clearEntityEvents(entityId);
+			
+			// entity.events.block.hits
+		} else if (command.equals("events.block.hits")) {
+			int entityId = Integer.parseInt(args[0]);
+			session.send(session.getBlockHits(entityId));
+
+			// entity.events.chat.posts
+		} else if (command.equals("events.chat.posts")) {
+			int entityId = Integer.parseInt(args[0]);
+			session.send(session.getChatPosts(entityId));
+
+			// entity.events.projectile.hits
+		} else if(command.equals("events.projectile.hits")) {
+			int entityId = Integer.parseInt(args[0]);
+			session.send(session.getProjectileHits(entityId));
 
 		} else {
 			session.plugin.getLogger().warning(preFix + command + " is not supported.");

@@ -184,6 +184,35 @@ public class CmdPlayer {
 
 			session.send(player.getLocation().getPitch());
 
+		} else if (command.equals("getEntities")) {
+			int distance = Integer.parseInt(args[0]);
+			String entityType = args[1];
+
+			session.send(session.getEntities(session.origin.getWorld(), player.getEntityId(), distance, entityType));
+
+		// player.removeEntities
+		} else if (command.equals("removeEntities")) {
+			int distance = Integer.parseInt(args[0]);
+			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(args[1]);
+
+			session.send(session.removeEntities(session.origin.getWorld(), player.getEntityId(), distance, entityType));
+
+		// player.events.block.hits
+		} else if (command.equals("events.block.hits")) {
+			session.send(session.getBlockHits(player.getEntityId()));
+			
+		// player.events.chat.posts
+		} else if (command.equals("events.chat.posts")) {
+			session.send(session.getChatPosts(player.getEntityId()));
+			
+		// player.events.projectile.hits
+		} else if(command.equals("events.projectile.hits")) {
+			session.send(session.getProjectileHits(player.getEntityId()));
+		
+		// player.events.clear
+		} else if (command.equals("events.clear")) {
+			session.clearEntityEvents(player.getEntityId());
+			
             // player.getFoodLevel
         } else if (command.equals("getFoodLevel")) {
 

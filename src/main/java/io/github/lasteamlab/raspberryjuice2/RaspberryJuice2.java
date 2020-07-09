@@ -3,18 +3,22 @@ package io.github.lasteamlab.raspberryjuice2;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.InetSocketAddress;
 import java.util.*;
+
 
 public class RaspberryJuice2 extends JavaPlugin implements Listener {
 
@@ -90,6 +94,15 @@ public class RaspberryJuice2 extends JavaPlugin implements Listener {
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new TickHandler(), 1, 1);
 	}
 
+	@EventHandler
+	public void PlayerJoin(PlayerJoinEvent event) {
+		Player p = event.getPlayer();
+		//p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, Integer.MAX_VALUE, 2, true, false));	// give night vision power
+		Server server = getServer();
+		server.broadcastMessage("Welcome " + p.getPlayerListName());
+	}
+	
+
 	@EventHandler(ignoreCancelled = true)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		// only react to events which are of the correct type
@@ -123,6 +136,14 @@ public class RaspberryJuice2 extends JavaPlugin implements Listener {
 		}
 	}
 
+	@EventHandler(ignoreCancelled=true)
+	public void onProjectileHit(ProjectileHitEvent event) {
+	               
+		for (RemoteSession session: sessions) {
+			session.queueProjectileHitEvent(event);
+	    }
+	}
+	
 	/**
 	 * called when a new session is established.
 	 */

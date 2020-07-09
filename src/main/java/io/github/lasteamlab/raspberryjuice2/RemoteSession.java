@@ -4,10 +4,18 @@ import io.github.lasteamlab.raspberryjuice2.cmd.CmdEntity;
 import io.github.lasteamlab.raspberryjuice2.cmd.CmdEvent;
 import io.github.lasteamlab.raspberryjuice2.cmd.CmdPlayer;
 import io.github.lasteamlab.raspberryjuice2.cmd.CmdWorld;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -15,12 +23,14 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Arrays; 
+import java.util.Iterator;
+
 
 public class RemoteSession {
 
     private final LocationType locationType;
 
-    private Location origin;
+    public Location origin;
 
     private Socket socket;
 
@@ -45,6 +55,8 @@ public class RemoteSession {
     public ArrayDeque<PlayerInteractEvent> interactEventQueue = new ArrayDeque<PlayerInteractEvent>();
 
     public ArrayDeque<AsyncPlayerChatEvent> chatPostedQueue = new ArrayDeque<AsyncPlayerChatEvent>();
+    
+    protected ArrayDeque<ProjectileHitEvent> projectileHitQueue = new ArrayDeque<ProjectileHitEvent>();
 
     private int maxCommandsPerTick = 9000;
 
@@ -113,7 +125,19 @@ public class RemoteSession {
         chatPostedQueue.add(event);
     }
 
-    /**
+    public void queueProjectileHitEvent(ProjectileHitEvent event) {
+    	//plugin.getLogger().info(event.toString());
+
+    	if (event.getEntityType() == EntityType.ARROW) {
+    		Arrow arrow = (Arrow) event.getEntity();
+    		if (arrow.getShooter() instanceof Player) {
+    			projectileHitQueue.add(event);
+    		}
+    	}
+    }
+
+
+    	/**
      * called from the server main thread
      */
     public void tick() {
@@ -210,70 +234,7 @@ public class RemoteSession {
         }
     }
 
-    // create a cuboid of lots of blocks
-    private void setCuboid(Location pos1, Location pos2, String blockType, byte data) {
-        int minX, maxX, minY, maxY, minZ, maxZ;
-        World world = pos1.getWorld();
-        minX = pos1.getBlockX() < pos2.getBlockX() ? pos1.getBlockX() : pos2.getBlockX();
-        maxX = pos1.getBlockX() >= pos2.getBlockX() ? pos1.getBlockX() : pos2.getBlockX();
-        minY = pos1.getBlockY() < pos2.getBlockY() ? pos1.getBlockY() : pos2.getBlockY();
-        maxY = pos1.getBlockY() >= pos2.getBlockY() ? pos1.getBlockY() : pos2.getBlockY();
-        minZ = pos1.getBlockZ() < pos2.getBlockZ() ? pos1.getBlockZ() : pos2.getBlockZ();
-        maxZ = pos1.getBlockZ() >= pos2.getBlockZ() ? pos1.getBlockZ() : pos2.getBlockZ();
-
-        for (int x = minX; x <= maxX; ++x) {
-            for (int z = minZ; z <= maxZ; ++z) {
-                for (int y = minY; y <= maxY; ++y) {
-                    updateBlock(world, x, y, z, blockType, data);
-                }
-            }
-        }
-    }
-
-    // get a cuboid of lots of blocks
-    private String getBlocks(Location pos1, Location pos2) {
-        StringBuilder blockData = new StringBuilder();
-
-        int minX, maxX, minY, maxY, minZ, maxZ;
-        World world = pos1.getWorld();
-        minX = pos1.getBlockX() < pos2.getBlockX() ? pos1.getBlockX() : pos2.getBlockX();
-        maxX = pos1.getBlockX() >= pos2.getBlockX() ? pos1.getBlockX() : pos2.getBlockX();
-        minY = pos1.getBlockY() < pos2.getBlockY() ? pos1.getBlockY() : pos2.getBlockY();
-        maxY = pos1.getBlockY() >= pos2.getBlockY() ? pos1.getBlockY() : pos2.getBlockY();
-        minZ = pos1.getBlockZ() < pos2.getBlockZ() ? pos1.getBlockZ() : pos2.getBlockZ();
-        maxZ = pos1.getBlockZ() >= pos2.getBlockZ() ? pos1.getBlockZ() : pos2.getBlockZ();
-
-        for (int y = minY; y <= maxY; ++y) {
-            for (int x = minX; x <= maxX; ++x) {
-                for (int z = minZ; z <= maxZ; ++z) {
-                    blockData.append(world.getBlockAt(x, y, z).getType().name() + ",");
-                }
-            }
-        }
-
-        return blockData.substring(0, blockData.length() > 0 ? blockData.length() - 1 : 0);    // We don't want last comma
-    }
-
     // updates a block
-    private void updateBlock(World world, Location loc, String blockType, byte blockData) {
-        Block thisBlock = world.getBlockAt(loc);
-        updateBlock(thisBlock, blockType, blockData);
-    }
-
-    private void updateBlock(World world, int x, int y, int z, String blockType, byte blockData) {
-        Block thisBlock = world.getBlockAt(x, y, z);
-        updateBlock(thisBlock, blockType, blockData);
-    }
-
-    private void updateBlock(Block thisBlock, String blockType, byte blockData) {
-        // check to see if the block is different - otherwise leave it
-        blockType = blockType.toUpperCase();
-        if ((thisBlock.getType() != Material.valueOf(blockType))) {
-            thisBlock.setType(Material.valueOf(blockType.toUpperCase()));
-//			thisBlock.setTypeIdAndData(blockType, blockData, true);
-        }
-    }
-
     // gets the current player
     public Player getCurrentPlayer() {
         if (!serverHasPlayer()) {
@@ -288,6 +249,21 @@ public class RemoteSession {
         }
         return player;
     }
+
+	public Player getCurrentPlayer(String name) {
+		// if a named player is returned use that
+		Player player = plugin.getPlayer(name);
+		// otherwise if there is an attached player for this session use that
+		if (player == null) {
+			player = attachedPlayer;
+			// otherwise go and get the host player and make that the attached player
+			if (player == null) {
+				player = plugin.getHostPlayer();
+				attachedPlayer = player;
+			}
+		}
+		return player;
+	}
 
     private boolean serverHasPlayer() {
         return !Bukkit.getOnlinePlayers().isEmpty();
@@ -345,7 +321,213 @@ public class RemoteSession {
         return new Location(world, originX + x, originY + y, originZ + z);
     }
 
-    public void send(Object a) {
+	public double getDistance(Entity ent1, Entity ent2) {
+		if (ent1 == null || ent2 == null)
+			return -1;
+		double dx = ent2.getLocation().getX() - ent1.getLocation().getX();
+		double dy = ent2.getLocation().getY() - ent1.getLocation().getY();
+		double dz = ent2.getLocation().getZ() - ent1.getLocation().getZ();
+		return Math.sqrt(dx*dx + dy*dy + dz*dz);
+	}
+
+	public String getEntities(World world, String typeEntite) {
+		StringBuilder bdr = new StringBuilder();	
+		if ("".equals(typeEntite)) {  // chaine vide on recherche toutes les entité
+			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on recherche toutes les entités dans le monde
+				if ( e.getType().isSpawnable()) {
+					bdr.append(getEntityMsg(e));
+				}			
+			} 
+		} else {  // on ne recherche que les entités du type demandé
+			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntite);
+			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on ne recherche que l'entité du type demandé
+				if ( ( e.getType() == entityType) && e.getType().isSpawnable()) {
+					bdr.append(getEntityMsg(e));
+				}
+			}			
+		}
+		return bdr.toString();
+	}
+	
+	public String getEntities(World world, int entityId, int distance, String typeEntite) {
+		Entity playerEntity = plugin.getEntity(entityId);
+		StringBuilder bdr = new StringBuilder();
+		
+		if ("".equals(typeEntite)) {  // chaine vide on recherche toutes les entités à proximité de entityId
+			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on recherche toutes les entités dans le monde
+				if ( e.getType().isSpawnable()  && 	getDistance(playerEntity, e) <= distance) {
+					bdr.append(getEntityMsg(e));
+				}			
+			} 
+		} else {  // on ne recherche que les entités du type demandé
+			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntite);
+			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on ne recherche que l'entité du type demandé
+				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	getDistance(playerEntity, e) <= distance ) {
+					bdr.append(getEntityMsg(e));
+				}
+			}			
+		}		
+		return bdr.toString();
+	}	
+
+	public String getEntityMsg(Entity entity) {
+		StringBuilder bdr = new StringBuilder();
+		bdr.append(entity.getEntityId());
+		bdr.append(",");
+		bdr.append(entity.getType().toString());
+		bdr.append(",");
+		bdr.append(entity.getLocation().getX());
+		bdr.append(",");
+		bdr.append(entity.getLocation().getY());
+		bdr.append(",");
+		bdr.append(entity.getLocation().getZ());
+		bdr.append("|");
+		return bdr.toString();
+	}
+
+	public int removeEntities(World world, int entityId, int distance, org.bukkit.entity.EntityType entityType) {
+		int removedEntitiesCount = 0;
+		Entity playerEntityId = plugin.getEntity(entityId);
+		for (Entity e : world.getEntities()) {
+			if (( e.getType() == entityType) && getDistance(playerEntityId, e) <= distance)
+			{
+				e.remove();
+				removedEntitiesCount++;
+			}
+		}
+		return removedEntitiesCount;
+	}
+
+	public String getChatPosts() {
+		return getChatPosts(-1);
+	}
+
+	public String getChatPosts(int entityId) {
+		StringBuilder b = new StringBuilder();
+		for (Iterator<AsyncPlayerChatEvent> iter = chatPostedQueue.iterator(); iter.hasNext(); ) {
+			AsyncPlayerChatEvent event = iter.next();
+			if (entityId == -1 || event.getPlayer().getEntityId() == entityId) {
+				b.append(event.getPlayer().getEntityId());
+				b.append(",");
+				b.append(event.getMessage());
+				b.append("|");
+				iter.remove();
+			}
+		}
+		if (b.length() > 0)
+			b.deleteCharAt(b.length() - 1);
+		 return b.toString();
+	}
+
+	public String getBlockHits() {
+		return getBlockHits(-1);
+	}
+
+	public String getBlockHits(int entityId) {
+		StringBuilder b = new StringBuilder();
+		for (Iterator<PlayerInteractEvent> iter = interactEventQueue.iterator(); iter.hasNext(); ) {
+			PlayerInteractEvent event = iter.next();
+			if (entityId == -1 || event.getPlayer().getEntityId() == entityId) {
+				Block block = event.getClickedBlock();
+				//plugin.getLogger().info("bloc touche avec epee");
+				Location loc = block.getLocation();
+				b.append(blockLocationToRelative(loc));
+				b.append(",");
+				// face du block touché 
+				b.append(blockFaceToNotch(event.getBlockFace())); // face convertie en entier
+				b.append(",");
+				b.append(event.getPlayer().getEntityId());
+				b.append("|");
+				iter.remove();					
+
+			}
+		}
+		
+		
+		if (b.length() > 0)
+			b.deleteCharAt(b.length() - 1);
+
+		return b.toString();
+	}
+
+	public String getProjectileHits() {
+		return getProjectileHits(-1);
+	}
+
+	public String getProjectileHits(int entityId) {
+		StringBuilder b = new StringBuilder();
+		for (Iterator<ProjectileHitEvent> iter = projectileHitQueue.iterator(); iter.hasNext(); ) {
+			ProjectileHitEvent event = iter.next();
+			Arrow arrow = (Arrow) event.getEntity();
+			LivingEntity shooter = (LivingEntity)arrow.getShooter();
+			if (entityId == -1 || shooter.getEntityId() == entityId) {
+				if (shooter instanceof Player) {
+					Player player = (Player)shooter;
+					Block block = arrow.getAttachedBlock(); 
+					if (block == null)
+						block = arrow.getLocation().getBlock();
+					Location loc = block.getLocation();
+					b.append(blockLocationToRelative(loc));
+					b.append(",");
+					//b.append(1); //blockFaceToNotch(event.getBlockFace()), but don't really care
+					//b.append(",");
+					b.append(player.getPlayerListName());   // nom du joueur
+					
+					Entity hitEntity = event.getHitEntity();
+					if(hitEntity!=null){
+						if(hitEntity instanceof Player){	
+							b.append(",");
+							Player hitPlayer = (Player)hitEntity;
+							b.append(hitPlayer.getEntityId());
+							b.append(",");
+							b.append(hitPlayer.getPlayerListName());
+						}else{
+							b.append(",");
+							b.append(hitEntity.getEntityId());
+							b.append(",");
+							b.append(hitEntity.getType().toString());
+							//plugin.getLogger().info("Entité touchée : " + b.toString());
+						}
+					} else {  // on ajoute une information par défaut : identifiacteur 0 et "" nom de l'entité 
+						b.append(",");
+						b.append(0);
+						b.append(",");
+						b.append("");
+					}
+				}
+				b.append("|");
+				arrow.remove();
+				iter.remove();
+			}						
+		}
+		if (b.length() > 0)
+			b.deleteCharAt(b.length() - 1); 
+		//plugin.getLogger().info("Entité touchée : " + b.toString());
+		return b.toString();
+	
+	}
+	
+	public void clearEntityEvents(int entityId) {
+		for (Iterator<PlayerInteractEvent> iter = interactEventQueue.iterator(); iter.hasNext(); ) {
+			PlayerInteractEvent event = iter.next();
+			if (event.getPlayer().getEntityId() == entityId)
+				iter.remove();
+		}
+		for (Iterator<AsyncPlayerChatEvent> iter = chatPostedQueue.iterator(); iter.hasNext(); ) {
+			AsyncPlayerChatEvent event = iter.next();
+			if (event.getPlayer().getEntityId() == entityId)
+				iter.remove();
+		}
+		for (Iterator<ProjectileHitEvent> iter = projectileHitQueue.iterator(); iter.hasNext(); ) {
+			ProjectileHitEvent event = iter.next();
+			Arrow arrow = (Arrow) event.getEntity();
+			LivingEntity shooter = (LivingEntity)arrow.getShooter();
+			if (shooter.getEntityId() == entityId)
+				iter.remove();
+		}
+	}
+	
+	public void send(Object a) {
         send(a.toString());
     }
 
@@ -459,7 +641,7 @@ public class RemoteSession {
     /**
      * from CraftBukkit's org.bukkit.craftbukkit.block.CraftBlock.blockFactToNotch
      */
-    public static int blockFaceToNotch(BlockFace face) {
+    public int blockFaceToNotch(BlockFace face) {
         switch (face) {
             case DOWN:
                 return 0;
