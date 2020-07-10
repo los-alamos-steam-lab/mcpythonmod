@@ -330,39 +330,28 @@ public class RemoteSession {
 		return Math.sqrt(dx*dx + dy*dy + dz*dz);
 	}
 
-	public String getEntities(World world, String typeEntite) {
-		StringBuilder bdr = new StringBuilder();	
-		if ("".equals(typeEntite)) {  // chaine vide on recherche toutes les entité
-			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on recherche toutes les entités dans le monde
-				if ( e.getType().isSpawnable()) {
-					bdr.append(getEntityMsg(e));
-				}			
-			} 
-		} else {  // on ne recherche que les entités du type demandé
-			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntite);
-			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on ne recherche que l'entité du type demandé
-				if ( ( e.getType() == entityType) && e.getType().isSpawnable()) {
-					bdr.append(getEntityMsg(e));
-				}
-			}			
-		}
-		return bdr.toString();
+	public String getEntities(World world, String typeEntity) {
+		return getEntities(world, null, -1, typeEntity); 
 	}
 	
-	public String getEntities(World world, int entityId, int distance, String typeEntite) {
-		Entity playerEntity = plugin.getEntity(entityId);
+	public String getEntities(World world, int entityid, int distance, String typeEntity) {
+		Entity entity = plugin.getEntity(entityid);
+		return getEntities(world, entity, distance, typeEntity);
+	}
+
+	public String getEntities(World world, Entity entity, int distance, String typeEntity) {
 		StringBuilder bdr = new StringBuilder();
-		
-		if ("".equals(typeEntite)) {  // chaine vide on recherche toutes les entités à proximité de entityId
+
+		if ("".equals(typeEntity)) {  // chaine vide on recherche toutes les entités à proximité de entityId
 			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on recherche toutes les entités dans le monde
-				if ( e.getType().isSpawnable()  && 	getDistance(playerEntity, e) <= distance) {
+				if ( e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
 					bdr.append(getEntityMsg(e));
 				}			
 			} 
 		} else {  // on ne recherche que les entités du type demandé
-			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntite);
+			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntity);
 			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on ne recherche que l'entité du type demandé
-				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	getDistance(playerEntity, e) <= distance ) {
+				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
 					bdr.append(getEntityMsg(e));
 				}
 			}			
@@ -385,16 +374,44 @@ public class RemoteSession {
 		return bdr.toString();
 	}
 
-	public int removeEntities(World world, int entityId, int distance, org.bukkit.entity.EntityType entityType) {
+	public int removeEntities(World world, Entity entity, int distance) {
+		return removeEntities(world, entity, distance, ""); 
+	}
+	
+	public int removeEntities(World world, int entityid, int distance) {
+		Entity entity = plugin.getEntity(entityid);
+		return removeEntities(world, entity, distance, ""); 
+	}
+	
+	public int removeEntities(World world, String typeEntity) {
+		return removeEntities(world, null, -1, typeEntity); 
+	}
+
+	public int removeEntities(World world, int entityid, int distance, String typeEntity) {
+		Entity entity = plugin.getEntity(entityid);
+		return removeEntities(world, entity, distance, typeEntity); 
+	}
+	
+	public int removeEntities(World world, Entity entity, int distance, String typeEntity) {
 		int removedEntitiesCount = 0;
-		Entity playerEntityId = plugin.getEntity(entityId);
-		for (Entity e : world.getEntities()) {
-			if (( e.getType() == entityType) && getDistance(playerEntityId, e) <= distance)
-			{
-				e.remove();
-				removedEntitiesCount++;
-			}
-		}
+
+		if ("".equals(typeEntity)) {  // chaine vide on recherche toutes les entités à proximité de entityId
+			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on recherche toutes les entités dans le monde
+				if ( e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
+					e.remove();
+					removedEntitiesCount++;
+				}			
+			} 
+		} else {  // on ne recherche que les entités du type demandé
+			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntity);
+			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on ne recherche que l'entité du type demandé
+				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
+					e.remove();
+					removedEntitiesCount++;
+				}
+			}			
+		}		
+
 		return removedEntitiesCount;
 	}
 

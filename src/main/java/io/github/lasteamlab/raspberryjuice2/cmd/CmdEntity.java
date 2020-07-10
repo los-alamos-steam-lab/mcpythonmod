@@ -112,10 +112,13 @@ public class CmdEntity {
 				
 		// entity.removeEntities
 		} else if (command.equals("removeEntities")) {
-			plugin.getLogger().info(args[0] + args[1] + args[2]);
 			int entityId = Integer.parseInt(args[0]);
 			int distance = Integer.parseInt(args[1]);
-			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(args[2]);
+			String entityType = "";
+
+			if (args.length == 3) {
+				entityType = args[2];
+			}				
 
 			session.send(session.removeEntities(session.origin.getWorld(), entityId, distance, entityType));
 			// entity.events.clear

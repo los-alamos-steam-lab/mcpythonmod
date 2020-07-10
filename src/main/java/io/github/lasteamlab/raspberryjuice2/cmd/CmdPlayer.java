@@ -67,7 +67,7 @@ public class CmdPlayer {
 	    	Integer intid = Integer.parseInt(id);  
 	    	execute(command, args,  intid);
 	    	return;
-	    } finally {
+	    } catch(Exception e) {
 	    	Player player = getPlayer(id);
 
 		    if (player == null) {
@@ -186,16 +186,24 @@ public class CmdPlayer {
 
 		} else if (command.equals("getEntities")) {
 			int distance = Integer.parseInt(args[0]);
-			String entityType = args[1];
+			String entityType = "";
 
-			session.send(session.getEntities(session.origin.getWorld(), player.getEntityId(), distance, entityType));
+			if (args.length == 2) {
+				entityType = args[1];
+			}				
+			
+			session.send(session.getEntities(session.origin.getWorld(), player, distance, entityType));
 
 		// player.removeEntities
 		} else if (command.equals("removeEntities")) {
 			int distance = Integer.parseInt(args[0]);
-			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(args[1]);
+			String entityType = "";
 
-			session.send(session.removeEntities(session.origin.getWorld(), player.getEntityId(), distance, entityType));
+			if (args.length == 2) {
+				entityType = args[1];
+			}				
+
+			session.send(session.removeEntities(session.origin.getWorld(), player, distance, entityType));
 
 		// player.events.block.hits
 		} else if (command.equals("events.block.hits")) {
