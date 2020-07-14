@@ -46,7 +46,7 @@ public class CmdWorld {
 
 			session.send(getBlocks(loc1, loc2));
 
-		} else if (command.equals("world.getBlockWithData")) {
+		} else if (command.equals("getBlockWithData")) {
 			Location loc = session.parseRelativeBlockLocation(args[0], args[1], args[2]);
 			org.bukkit.block.Block block = world.getBlockAt(loc);
 			org.bukkit.block.data.BlockData blockdata =  block.getBlockData();
