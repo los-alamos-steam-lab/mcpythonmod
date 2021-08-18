@@ -187,8 +187,8 @@ Modify config.yml:
 To build RaspberryJuice2, [download and install Maven](https://maven.apache.org/install.html), clone the repository, run `mvn package':
 
 ```
-git clone https://github.com/lasteamlab/RaspberryJuice2
-cd RaspberryJuice2
+git clone https://github.com/lasteamlab/mc-python-mod
+cd mc-python-mod
 mvn package
 ```
 
