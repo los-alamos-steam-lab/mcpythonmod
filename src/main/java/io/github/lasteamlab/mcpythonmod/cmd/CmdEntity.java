@@ -1,17 +1,18 @@
-package io.github.lasteamlab.raspberryjuice2.cmd;
+package io.github.lasteamlab.mcpythonmod.cmd;
 
 
-import io.github.lasteamlab.raspberryjuice2.RaspberryJuice2;
-import io.github.lasteamlab.raspberryjuice2.RemoteSession;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import io.github.lasteamlab.mcpythonmod.MCPythonMod;
+import io.github.lasteamlab.mcpythonmod.RemoteSession;
+
 public class CmdEntity {
 	private final String preFix = "entity.";
 	private RemoteSession session;
-	private RaspberryJuice2 plugin;
+	private MCPythonMod plugin;
 
 	public CmdEntity(RemoteSession session) {
 		this.session = session;

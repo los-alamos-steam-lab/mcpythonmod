@@ -1,4 +1,4 @@
-package io.github.lasteamlab.raspberryjuice2;
+package io.github.lasteamlab.mcpythonmod;
 
 import java.io.*;
 import java.net.*;
@@ -11,9 +11,9 @@ public class ServerListenerThread implements Runnable {
 
 	public boolean running = true;
 
-	private RaspberryJuice2 plugin;
+	private MCPythonMod plugin;
 
-	public ServerListenerThread(RaspberryJuice2 plugin, SocketAddress bindAddress) throws IOException {
+	public ServerListenerThread(MCPythonMod plugin, SocketAddress bindAddress) throws IOException {
 		this.plugin = plugin;
 		this.bindAddress = bindAddress;
 		serverSocket = new ServerSocket();

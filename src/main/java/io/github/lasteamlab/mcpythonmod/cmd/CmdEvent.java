@@ -1,6 +1,6 @@
-package io.github.lasteamlab.raspberryjuice2.cmd;
+package io.github.lasteamlab.mcpythonmod.cmd;
 
-import io.github.lasteamlab.raspberryjuice2.RemoteSession;
+import io.github.lasteamlab.mcpythonmod.RemoteSession;
 
 public class CmdEvent {
     private final String preFix = "events.";

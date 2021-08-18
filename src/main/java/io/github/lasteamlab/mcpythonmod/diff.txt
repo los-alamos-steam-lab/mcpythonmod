@@ -1,7 +1,7 @@
 --- RemoteSession.java	2020-07-07 21:54:03.000000000 -0600
 +++ /Users/lis/Desktop/projet_python_minecraft/src/com/sbp/pythondsminecraft/RemoteSession.java	2020-06-27 01:39:46.000000000 -0600
 @@ -1,14 +1,26 @@
--package io.github.lasteamlab.raspberryjuice2;
+-package io.github.lasteamlab.mcpythonmod;
 +package com.sbp.pythondsminecraft;
 +
 +//https://getbukkit.org/download/craftbukkit  version 1.15.1
@@ -19,10 +19,10 @@
 +import java.util.Collection;
 +import java.util.Iterator;
  
--import io.github.lasteamlab.raspberryjuice2.cmd.CmdEntity;
--import io.github.lasteamlab.raspberryjuice2.cmd.CmdEvent;
--import io.github.lasteamlab.raspberryjuice2.cmd.CmdPlayer;
--import io.github.lasteamlab.raspberryjuice2.cmd.CmdWorld;
+-import io.github.lasteamlab.mcpythonmod.cmd.CmdEntity;
+-import io.github.lasteamlab.mcpythonmod.cmd.CmdEvent;
+-import io.github.lasteamlab.mcpythonmod.cmd.CmdPlayer;
+-import io.github.lasteamlab.mcpythonmod.cmd.CmdWorld;
  import org.bukkit.Bukkit;
  import org.bukkit.Location;
  import org.bukkit.Material;
@@ -51,7 +51,7 @@
  
      public boolean pendingRemoval = false;
  
--    public RaspberryJuice2 plugin;
+-    public MCPythonMod plugin;
 +	public pythondsminecraft plugin;
  
      protected ArrayDeque<PlayerInteractEvent> interactEventQueue = new ArrayDeque<PlayerInteractEvent>();

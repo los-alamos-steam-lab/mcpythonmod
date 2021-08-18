@@ -1,4 +1,4 @@
-package io.github.lasteamlab.raspberryjuice2;
+package io.github.lasteamlab.mcpythonmod;
 
 /**
  * Config option to determine whether locations are relative to the spawn point (default like pi) or absolute

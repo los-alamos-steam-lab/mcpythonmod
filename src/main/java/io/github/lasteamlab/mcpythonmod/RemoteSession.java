@@ -1,9 +1,5 @@
-package io.github.lasteamlab.raspberryjuice2;
+package io.github.lasteamlab.mcpythonmod;
 
-import io.github.lasteamlab.raspberryjuice2.cmd.CmdEntity;
-import io.github.lasteamlab.raspberryjuice2.cmd.CmdEvent;
-import io.github.lasteamlab.raspberryjuice2.cmd.CmdPlayer;
-import io.github.lasteamlab.raspberryjuice2.cmd.CmdWorld;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -18,6 +14,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import io.github.lasteamlab.mcpythonmod.cmd.CmdEntity;
+import io.github.lasteamlab.mcpythonmod.cmd.CmdEvent;
+import io.github.lasteamlab.mcpythonmod.cmd.CmdPlayer;
+import io.github.lasteamlab.mcpythonmod.cmd.CmdWorld;
 
 import java.io.*;
 import java.net.Socket;
@@ -50,7 +51,7 @@ public class RemoteSession {
 
     public boolean pendingRemoval = false;
 
-    public RaspberryJuice2 plugin;
+    public MCPythonMod plugin;
 
     public ArrayDeque<PlayerInteractEvent> interactEventQueue = new ArrayDeque<PlayerInteractEvent>();
 
@@ -69,7 +70,7 @@ public class RemoteSession {
     private CmdPlayer cmdPlayer;
     private CmdWorld cmdWorld;
 
-    public RemoteSession(RaspberryJuice2 plugin, Socket socket) throws IOException {
+    public RemoteSession(MCPythonMod plugin, Socket socket) throws IOException {
         this.socket = socket;
         this.plugin = plugin;
         this.locationType = plugin.getLocationType();

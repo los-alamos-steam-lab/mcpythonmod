@@ -1,10 +1,11 @@
-package io.github.lasteamlab.raspberryjuice2.cmd;
+package io.github.lasteamlab.mcpythonmod.cmd;
 
-import io.github.lasteamlab.raspberryjuice2.RemoteSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import io.github.lasteamlab.mcpythonmod.RemoteSession;
 
 public class CmdPlayer {
     private final String preFix = "player.";

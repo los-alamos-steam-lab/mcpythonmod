@@ -1,7 +1,7 @@
 author: [Zhuowei,MinecraftDawn,lasteamlab]
 description: Implementation of the Minecraft PI modding API
-main: io.github.lasteamlab.raspberryjuice2.RaspberryJuice2
-name: RaspberryJuice2
+main: io.github.lasteamlab.mcpythonmod.MCPythonMod
+name: MCPythonMod
 startup: postworld
 version: '1.15-0.0'
 api-version: 1.13

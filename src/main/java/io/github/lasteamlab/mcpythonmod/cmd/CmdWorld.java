@@ -1,8 +1,5 @@
-package io.github.lasteamlab.raspberryjuice2.cmd;
+package io.github.lasteamlab.mcpythonmod.cmd;
 
-import io.github.lasteamlab.raspberryjuice2.RaspberryJuice2;
-
-import io.github.lasteamlab.raspberryjuice2.RemoteSession;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +13,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import io.github.lasteamlab.mcpythonmod.MCPythonMod;
+import io.github.lasteamlab.mcpythonmod.RemoteSession;
+
 import java.util.Collection;
 import java.util.List;  // nécessaire pour l'utilisation de List
 
@@ -23,7 +23,7 @@ import java.util.List;  // nécessaire pour l'utilisation de List
 public class CmdWorld {
 	private final String preFix = "world.";
 	private RemoteSession session;
-	private RaspberryJuice2 plugin;
+	private MCPythonMod plugin;
 
 	public CmdWorld(RemoteSession session) {
 		this.session = session;

@@ -1,4 +1,4 @@
-package io.github.lasteamlab.raspberryjuice2;
+package io.github.lasteamlab.mcpythonmod;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,7 +20,7 @@ import java.net.InetSocketAddress;
 import java.util.*;
 
 
-public class RaspberryJuice2 extends JavaPlugin implements Listener {
+public class MCPythonMod extends JavaPlugin implements Listener {
 
 	public static final Set<Material> blockBreakDetectionTools = EnumSet.of(
 			Material.DIAMOND_SWORD,
