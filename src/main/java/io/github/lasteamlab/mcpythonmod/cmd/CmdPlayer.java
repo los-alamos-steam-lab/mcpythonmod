@@ -5,57 +5,22 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import io.github.lasteamlab.mcpythonmod.MCPythonMod;
 import io.github.lasteamlab.mcpythonmod.RemoteSession;
 
 public class CmdPlayer {
     private final String preFix = "player.";
     private RemoteSession session;
+	private MCPythonMod plugin;
 
     public CmdPlayer(RemoteSession session) {
         this.session = session;
+		this.plugin = session.plugin;
     }
 
-	private boolean serverHasPlayer() {
-		return !Bukkit.getOnlinePlayers().isEmpty();
-	}
-
-	public Player getPlayer(String name) {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (name.equals(player.getPlayerListName())) {
-				session.plugin.getLogger().info("Got player " + name);
-				return player;
-			}
-		}
-		session.send("Fail,There are no players with that name in the server.");
-		return null;
-	}
-
-	public Player getPlayer(int id) {
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (p.getEntityId() == id) {
-				session.plugin.getLogger().info("Got player " + id);
-				return p;
-			}
-		}
-		session.send("Fail,There are no players with that id in the server.");
-		return null;
-	}
-
-	private Player getPlayer() {
-		if (!serverHasPlayer()) {
-			session.send("Fail,There are no players in the server.");
-			return null;
-		} else {
-			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-				session.plugin.getLogger().info("Got default player");
-				return player;
-			}
-		}
-		return null;
-	}
 
     public void execute(String command, String[] args) {
-		Player player = getPlayer();
+		Player player = plugin.getPlayer();
 		if (player == null) {
 			return;
 		}
@@ -69,7 +34,7 @@ public class CmdPlayer {
 	    	execute(command, args,  intid);
 	    	return;
 	    } catch(Exception e) {
-	    	Player player = getPlayer(id);
+	    	Player player = plugin.getPlayer(id);
 
 		    if (player == null) {
 				session.send("Player " + id + " is not on server");
@@ -81,7 +46,7 @@ public class CmdPlayer {
     }
 
     public void execute(String command, String[] args, Integer id) {
-    	Player player = getPlayer(id);
+    	Player player = plugin.getPlayer(id);
 
     	if (player == null) {
 			session.send("Player " + id + " is not on server");
@@ -99,8 +64,13 @@ public class CmdPlayer {
 		}
 		session.plugin.getLogger().info("executing command with args " + args);
 
-		// player.getTile
-		if (command.equals("getTile")) {
+		// player.getType
+		if (command.equals("getType")) {
+
+			session.send(player.getType());
+
+			// player.getTile
+		} else if (command.equals("getTile")) {
 
 			session.send(session.blockLocationToRelative(player.getLocation()));
 

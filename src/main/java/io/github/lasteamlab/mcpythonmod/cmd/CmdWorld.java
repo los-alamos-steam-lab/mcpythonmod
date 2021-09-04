@@ -120,23 +120,21 @@ public class CmdWorld {
 		} else if (command.equals("getEntities")) {
 			String entityType = args[0];
 			session.send(session.getEntities(world, entityType));	// entityType est une chaîne de caractères			
-			// world.spawnEntity
+		
+		// world.spawnEntity
 		} else if (command.equals("spawnEntity")) {
+			CmdEntity cmdEntity = new CmdEntity(session);
 			Location loc = session.parseRelativeBlockLocation(args[0], args[1], args[2]);
 			org.bukkit.entity.EntityType typeanimal = org.bukkit.entity.EntityType.valueOf(args[3]);
 			Entity entity = world.spawnEntity(loc, typeanimal);
 			
-			// on vérifie qu'il s'agit d'un animal 				
-			if ( entity instanceof org.bukkit.entity.Animals) {
-				// s'il y a un argument supplémentaire il indique qu'il s'agit ou non d'un bébé
-				org.bukkit.entity.Animals animal = (org.bukkit.entity.Animals) entity;
-				int nbr_arg = args.length-4;
-				if (nbr_arg == 1) {
-					if (args[4].contentEquals("BABY") ){
-						animal.setBaby();
-					}
-				}					
-			}
+			
+			int nbr_arg = args.length-4;
+			if (nbr_arg == 1) {
+				if (args[4].contentEquals("BABY") ){
+					cmdEntity.setBaby(entity);
+				}
+			}					
 
 			session.send(entity.getEntityId());
 

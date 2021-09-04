@@ -345,14 +345,14 @@ public class RemoteSession {
 
 		if ("".equals(typeEntity)) {  // chaine vide on recherche toutes les entités à proximité de entityId
 			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on recherche toutes les entités dans le monde
-				if ( e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
+				if ( e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance) && entity != e) {
 					bdr.append(getEntityMsg(e));
 				}			
 			} 
 		} else {  // on ne recherche que les entités du type demandé
 			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntity);
 			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on ne recherche que l'entité du type demandé
-				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
+				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance) && entity != e) {
 					bdr.append(getEntityMsg(e));
 				}
 			}			
@@ -398,7 +398,7 @@ public class RemoteSession {
 
 		if ("".equals(typeEntity)) {  // chaine vide on recherche toutes les entités à proximité de entityId
 			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on recherche toutes les entités dans le monde
-				if ( e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
+				if ( e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance) && entity != e) {
 					e.remove();
 					removedEntitiesCount++;
 				}			
@@ -406,7 +406,7 @@ public class RemoteSession {
 		} else {  // on ne recherche que les entités du type demandé
 			org.bukkit.entity.EntityType entityType = org.bukkit.entity.EntityType.valueOf(typeEntity);
 			for (org.bukkit.entity.Entity e : world.getEntities()) {   // on ne recherche que l'entité du type demandé
-				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance)) {
+				if ( ( e.getType() == entityType) && e.getType().isSpawnable()  && 	(entity == null || distance < 0 || getDistance(entity, e) <= distance) && entity != e) {
 					e.remove();
 					removedEntitiesCount++;
 				}
