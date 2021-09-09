@@ -147,29 +147,37 @@ public class CmdEntity {
 	public void callMethod(Entity entity, String method, String[] args) {
 		Object result = null;
 		Method m = null;
-				
+
 		org.bukkit.entity.EntityType entityType = entity.getType();
 		Class<? extends Entity> entityClass = entityType.getEntityClass();
-		Object typedEntity = entityClass.cast(entity);
+		Object typedEntity = entityClass.cast(entity);			
+				
 
-						
+		StringBuilder b = new StringBuilder();	
+		
+		String[] noargslist = new String[] {"isAngry", "getCollarColor", "getVariant", "isPlayingDead", "isAwake", "getAnger", "getCannotEnterHiveTicks", "getFlower", "getHive", "hasNectar", "hasStung", "getCatType", "getRabbitType", "getFoxType", "getColor", "getInventory", "getStyle", "isScreaming", "getStrength", "getFirstTrustedPlayer", "getSecondTrustedPlayer", "isCrouching"};
+		String[] booleanlist = new String[] {"setCrouching", "setAngry", "setPlayingDead", "setAwake", "setHasNectar", "setHasStung", "setScreaming", "setSleeping"};
+
+
 		try {
 			
-			
-			if (Arrays.asList(new String[] {"isAngry", "getCollarColor", "getVariant", "isPlayingDead", "isAwake", "getAnger", "getCannotEnterHiveTicks", "getFlower", "getHive", "hasNectar", "hasStung"}).contains(method)) {
+			// no Args
+			if (Arrays.asList(noargslist).contains(method)) {
 				m = typedEntity.getClass().getMethod(method);
 				result = m.invoke(typedEntity);
-			
-			// no Args
-			} else if (Arrays.asList(new String[] {"setAngry", "setPlayingDead", "setAwake", "setHasNectar", "setHasStung​"}).contains(method)){
-				m = typedEntity.getClass().getMethod(method, new Class[] {Boolean.class});
-				if (args[0].toLowerCase() == "true" || args[0] == "1"){
+			// Boolean arg
+			} else if (Arrays.asList(booleanlist).contains(method)) {
+				m = typedEntity.getClass().getMethod(method, new Class[] {boolean.class});
+				if (Boolean.parseBoolean(args[0])){
 					result = m.invoke(typedEntity, new Object[] {true});
+					b.append(" - made it to true - ");
 				} else {
 					result = m.invoke(typedEntity, new Object[] {false});
+					b.append(" - made it to false - ");
+					b.append(args[0].toLowerCase());
 				}			
-			// Boolean arg
-			} else if (Arrays.asList(new String[] {"setAge", "setAnger​", "setCannotEnterHiveTicks​"}).contains(method)){
+			// int arg
+			} else if (Arrays.asList(new String[] {"setAge", "setAnger", "setCannotEnterHiveTicks", "setStrength"}).contains(method)){
 				m = typedEntity.getClass().getMethod(method, new Class[] {int.class});
 				result = m.invoke(typedEntity, new Object[] { Integer.parseInt(args[0])});
 			// dyecolor arg
@@ -178,7 +186,7 @@ public class CmdEntity {
 				m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.DyeColor.class});
 				result = m.invoke(typedEntity, new Object[] { color });
 			// location arg
-			} else if (Arrays.asList(new String[] {"setFlower​", "setHive​"}).contains(method)){
+			} else if (Arrays.asList(new String[] {"setFlower", "setHive"}).contains(method)){
 				org.bukkit.Location location = new org.bukkit.Location( session.origin.getWorld(),  Integer.parseInt(args[0]),  Integer.parseInt(args[1]), Integer.parseInt( args[2]));
 				m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.Location.class});
 				result = m.invoke(typedEntity, new Object[] { location });
@@ -189,7 +197,57 @@ public class CmdEntity {
 					variant = org.bukkit.entity.Axolotl.Variant.valueOf(args[0].toUpperCase());
 					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Axolotl.Variant.class});
 				}
+				if (typedEntity instanceof org.bukkit.entity.Parrot) {
+					variant = org.bukkit.entity.Parrot.Variant.valueOf(args[0].toUpperCase());
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Parrot.Variant.class});
+				}
 				result = m.invoke(typedEntity, new Object[] { variant });
+			} else if (Arrays.asList(new String[] {"setCatType"}).contains(method)){
+				Object type = null;
+				if (typedEntity instanceof org.bukkit.entity.Cat) {
+					type = org.bukkit.entity.Cat.Type.valueOf(args[0].toUpperCase());
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Cat.Type.class});
+				}
+				result = m.invoke(typedEntity, new Object[] { type });
+			} else if (Arrays.asList(new String[] {"setRabbitType"}).contains(method)){
+				Object type = null;
+				if (typedEntity instanceof org.bukkit.entity.Rabbit) {
+					type = org.bukkit.entity.Rabbit.Type.valueOf(args[0].toUpperCase());
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Rabbit.Type.class});
+				}
+				result = m.invoke(typedEntity, new Object[] { type });
+			} else if (Arrays.asList(new String[] {"setFoxType"}).contains(method)){
+				Object type = null;
+				if (typedEntity instanceof org.bukkit.entity.Fox) {
+					type = org.bukkit.entity.Fox.Type.valueOf(args[0].toUpperCase());
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Fox.Type.class});
+				}
+				result = m.invoke(typedEntity, new Object[] { type });
+			} else if (Arrays.asList(new String[] {"setColor"}).contains(method)){
+				Object color = null;
+				if (typedEntity instanceof org.bukkit.entity.Horse) {
+					color = org.bukkit.entity.Horse.Color.valueOf(args[0].toUpperCase());
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Horse.Color.class});
+				} else if (typedEntity instanceof org.bukkit.entity.Llama) {
+					color = org.bukkit.entity.Llama.Color.valueOf(args[0].toUpperCase());
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Llama.Color.class});
+				}
+				result = m.invoke(typedEntity, new Object[] { color });
+			} else if (Arrays.asList(new String[] {"setStyle"}).contains(method)){
+				Object style = null;
+				if (typedEntity instanceof org.bukkit.entity.Horse) {
+					style = org.bukkit.entity.Horse.Style.valueOf(args[0].toUpperCase());
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Horse.Style.class});
+				}
+				result = m.invoke(typedEntity, new Object[] { style });
+			} else if (Arrays.asList(new String[] {"setFirstTrustedPlayer", "setSecondTrustedPlayer"}).contains(method)){
+				Entity player = plugin.getEntity(Integer.parseInt(args[0]));
+				org.bukkit.entity.AnimalTamer tamer = (org.bukkit.entity.AnimalTamer) player;
+
+				if (typedEntity instanceof org.bukkit.entity.Fox) {
+					m = typedEntity.getClass().getMethod(method, new Class[] {org.bukkit.entity.Horse.Style.class});
+				}				
+				result = m.invoke(typedEntity, new Object[] { tamer });
 			}
 			
 			
@@ -201,7 +259,6 @@ public class CmdEntity {
 		
 
 		
-		StringBuilder b = new StringBuilder();
 		b.append(result);
 		
 		for (Object o : args) {
@@ -395,7 +452,7 @@ public class CmdEntity {
 			boolean tamed = Boolean.parseBoolean(args[1]);
 			setTamed(entity, tamed);
 			
-		//entity.tameable.getOwner
+		//entity.Tameable.getOwner
 		} else if (command.equals("getOwner")) {
 			if ( entity instanceof org.bukkit.entity.Tameable) {
 				// retype the entity to be an ageable entity
@@ -409,11 +466,77 @@ public class CmdEntity {
 				session.send("Fail, entity is not tameable");
 			}
 			
-		//entity.tameable.setOwner
+		//entity.Tameable.setOwner
 		} else if (command.equals("setOwner")) {
 			int ownerid = Integer.parseInt(args[1]);
 			setOwner(entity, ownerid);
-			
+
+		// entity.AbstractHorse.getDomestication()
+		} else if (command.equals("getDomestication")) {
+			if ( entity instanceof org.bukkit.entity.AbstractHorse) {
+				// retype the entity to be an AbstractHorse
+				org.bukkit.entity.AbstractHorse horse = (org.bukkit.entity.AbstractHorse) entity;
+				session.send(horse.getDomestication());
+			} else {
+				session.send("Fail, entity is not AbstractHorse");
+			}
+				
+		// entity.AbstractHorse.setDomestication()
+		} else if (command.equals("setDomestication")) {
+			int level = Integer.parseInt(args[1]);
+			if ( entity instanceof org.bukkit.entity.AbstractHorse) {
+				// retype the entity to be an AbstractHorse
+				org.bukkit.entity.AbstractHorse horse = (org.bukkit.entity.AbstractHorse) entity;
+				horse.setDomestication(level);
+				session.send(horse.getDomestication());
+			} else {
+				session.send("Fail, entity is not AbstractHorse");
+			}
+				
+			// entity.AbstractHorse.getMaxDomestication()
+			} else if (command.equals("getMaxDomestication")) {
+				if ( entity instanceof org.bukkit.entity.AbstractHorse) {
+					// retype the entity to be an AbstractHorse
+					org.bukkit.entity.AbstractHorse horse = (org.bukkit.entity.AbstractHorse) entity;
+					session.send(horse.getMaxDomestication());
+				} else {
+					session.send("Fail, entity is not AbstractHorse");
+				}
+					
+			// entity.AbstractHorse.setMaxDomestication()
+			} else if (command.equals("setMaxDomestication")) {
+				int level = Integer.parseInt(args[1]);
+				if ( entity instanceof org.bukkit.entity.AbstractHorse) {
+					// retype the entity to be an AbstractHorse
+					org.bukkit.entity.AbstractHorse horse = (org.bukkit.entity.AbstractHorse) entity;
+					horse.setMaxDomestication(level);
+					session.send(horse.getMaxDomestication());
+				} else {
+					session.send("Fail, entity is not AbstractHorse");
+				}
+					
+		// entity.AbstractHorse.getJumpStrength()
+		} else if (command.equals("getJumpStrength")) {
+			if ( entity instanceof org.bukkit.entity.AbstractHorse) {
+				// retype the entity to be an AbstractHorse
+				org.bukkit.entity.AbstractHorse horse = (org.bukkit.entity.AbstractHorse) entity;
+				session.send(horse.getJumpStrength());
+			} else {
+				session.send("Fail, entity is not AbstractHorse");
+			}
+				
+		// entity.AbstractHorse.setJumpStrength()
+		} else if (command.equals("setJumpStrength")) {
+			double strength = Double.parseDouble(args[1]);
+			if ( entity instanceof org.bukkit.entity.AbstractHorse) {
+				// retype the entity to be an AbstractHorse
+				org.bukkit.entity.AbstractHorse horse = (org.bukkit.entity.AbstractHorse) entity;
+				horse.setJumpStrength(strength);
+				session.send(horse.getJumpStrength());
+			} else {
+				session.send("Fail, entity is not AbstractHorse");
+			}
+					
 		// entity.events.clear
 		} else if (command.equals("events.clear")) {
 			int entityId = Integer.parseInt(args[0]);
